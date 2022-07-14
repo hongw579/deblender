@@ -135,29 +135,29 @@ class RDN(object):
         # Helper function with main phase shift operation
         bsize, a, b, c = I.get_shape().as_list()
         X = tf.reshape(I, (self.batch_size, a, b, r, r))
-        X = tf.split(X, a, 1)  # a, [bsize, b, r, r]
-        X = tf.concat([tf.squeeze(x, axis=1) for x in X], 2)  # bsize, b, a*r, r
-        X = tf.split(X, b, 1)  # b, [bsize, a*r, r]
-        X = tf.concat([tf.squeeze(x, axis=1) for x in X], 2)  # bsize, a*r, b*r
+        X = tf.split(X, a, 1)
+        X = tf.concat([tf.squeeze(x, axis=1) for x in X], 2)
+        X = tf.split(X, b, 1)
+        X = tf.concat([tf.squeeze(x, axis=1) for x in X], 2)
         return tf.reshape(X, (self.batch_size, a*r, b*r, 1))
 
     # NOTE: test without batchsize
     def _phase_shift_test(self, I ,r):
         bsize, a, b, c = I.get_shape().as_list()
         X = tf.reshape(I, (1, a, b, r, r))
-        X = tf.split(X, a, 1)  # a, [bsize, b, r, r]
-        X = tf.concat([tf.squeeze(x) for x in X], 1)  # bsize, b, a*r, r
-        X = tf.split(X, b, 0)  # b, [bsize, a*r, r]
-        X = tf.concat([tf.squeeze(x) for x in X], 1)  # bsize, a*r, b*r
+        X = tf.split(X, a, 1)
+        X = tf.concat([tf.squeeze(x) for x in X], 1)
+        X = tf.split(X, b, 0)
+        X = tf.concat([tf.squeeze(x) for x in X], 1)
         return tf.reshape(X, (1, a*r, b*r, 1))
 
     def PS(self, X, r):
         # Main OP that you can arbitrarily use in you tensorflow code
         Xc = tf.split(X, 3, 3)
         if self.is_train:
-            X = tf.concat([self._phase_shift(x, r) for x in Xc], 3) # Do the concat RGB
+            X = tf.concat([self._phase_shift(x, r) for x in Xc], 3)
         else:
-            X = tf.concat([self._phase_shift_test(x, r) for x in Xc], 3) # Do the concat RGB
+            X = tf.concat([self._phase_shift_test(x, r) for x in Xc], 3)
         return X
 
     def model(self, inputs):
